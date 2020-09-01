@@ -20,23 +20,28 @@ export default function Scoreboard() {
   const [sortType, setSortType] = useState("Name");
   const [players, set_players] = useState([]);
   const [highestScore, setHighestScore] = useState(0);
+
   const onSortDropdownChange = (event) => {
     console.log(event.target.value);
     setSortType(event.target.value);
   };
+
   const incrementScore = (id, val) => {
-    let newArray = [...players];
-    let newItem = newArray.find((player) => {
-      return player.id === id;
+    //Map past all array elements,
+    //and if id matches, change score, otherwise return self
+    const newPlayers = players.map((player) => {
+      return player.id === id
+        ? { ...player, score: player.score + val }
+        : player;
     });
-    newItem.score += val;
-    set_players(newArray);
-    setHighestScore(Math.max(...players.map((o) => o.score), 0));
+    setHighestScore(Math.max(...newPlayers.map((o) => o.score), 0));
+    set_players(newPlayers);
   };
+
   const addPlayer = (name) => {
-    let newArray = [...players];
-    console.log("addplayer", name, " with id: ", newArray.length + 1);
-    newArray.push({ id: newArray.length + 1, name: name, score: 0 });
+    const addedObject = { id: players.length + 1, name: name, score: 0 };
+    //add something to an array, you could also switch to add it in the front
+    const newArray = [...players, addedObject];
     set_players(newArray);
   };
   return (
@@ -54,6 +59,7 @@ export default function Scoreboard() {
         .map((player) => {
           return (
             <PlayerBar
+              key={player.id}
               data={player}
               incrementScore={incrementScore}
               highestScore={highestScore}
